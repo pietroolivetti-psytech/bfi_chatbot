@@ -8,27 +8,24 @@ st.set_page_config(page_title="Chatbot com Personalidade", layout="wide")
 
 st.title("💬 Personalidade do Chatbot")
 
-# Defina sua senha (idealmente, também em secrets.toml)
-# Ex: APP_PASSWORD = "sua_senha_secreta_aqui" em .streamlit/secrets.toml
-SENHA_CORRETA = st.secrets.get("APP_PASSWORD", "minhasenhaforte") # Use uma senha forte de verdade!
-
 # Inicializa o estado da sessão para controle de acesso e API
 if 'api_client_ready' not in st.session_state:
     st.session_state['api_client_ready'] = False
 if 'api_source' not in st.session_state:
     st.session_state['api_source'] = "Nenhuma"
+# Não precisamos mais do estado 'logged_in' se a única forma é por API.
 
-st.sidebar.title("Acesso ao Aplicativo")
+st.sidebar.title("Configuração da API") # Mudança de "Acesso ao Aplicativo" para "Configuração da API"
 
-# Opção 2: Usuário insere a própria API
-with st.sidebar.expander("Usar Minha Própria API"):
-    user_api_key = st.text_input("Sua Chave de API da OpenAI:", type="password", key="user_api_key_input")
+# MANTÉM APENAS A OPÇÃO DE INSERIR A PRÓPRIA API
+with st.sidebar.expander("Insira Sua Chave de API da OpenAI"): # Nome do expander ajustado
+    user_api_key = st.text_input("Sua Chave de API:", type="password", key="user_api_key_input").strip()
     if st.button("Configurar API", key="configure_user_api"):
         if user_api_key:
             try:
                 st.session_state.client = openai.OpenAI(api_key=user_api_key)
-                # Opcional: Testar a chave com uma chamada simples para validar
-                # st.session_state.client.models.list()
+                # Opcional: Testar a chave com uma chamada simples para validar (descomente se quiser)
+                st.session_state.client.models.list()
                 st.success("Chave de API configurada com sucesso!")
                 st.session_state['api_client_ready'] = True
                 st.session_state['api_source'] = "Usuário"
@@ -39,14 +36,12 @@ with st.sidebar.expander("Usar Minha Própria API"):
             st.warning("Por favor, insira sua chave de API.")
             st.session_state['api_client_ready'] = False
 
-st.sidebar.markdown(f"Status da API: **{st.session_state.get('api_source', 'Nenhuma')}**")
+st.sidebar.markdown(f"Status da API: **{st.session_state.get('api_source', 'Não Configurada')}**") # Texto de status ajustado
 
 # Somente renderize o restante do aplicativo se a API estiver pronta
 if not st.session_state['api_client_ready']:
-    st.info("Por favor, acesse o aplicativo usando uma senha ou configurando sua chave de API na barra lateral.")
+    st.info("Por favor, configure sua chave de API da OpenAI na barra lateral para usar o aplicativo.")
     st.stop() # Impede a execução do restante do script
-
-# --- SEU CÓDIGO DO APLICATIVO PRINCIPAL COMEÇA AQUI ---
 
 # Menu lateral para escolher o modo
 modo = st.sidebar.radio("Escolha o modo:", ["📝 Preencher BFI-44", "🎛️ Definir facetas manualmente", "Chatbot"])
@@ -176,19 +171,18 @@ elif modo == "🎛️ Definir facetas manualmente":
             nivel = niveis[nome_faceta] # Obtém o nível selecionado para esta faceta
             
             perfil_texto += f"- **{nome_faceta}** ({descricao_faceta}): {nivel.lower()}.\n"
-
-        st.text_area("🧾 Perfil para o prompt do chatbot:", perfil_texto, height=300)
-        
+            
+        st.session_state.perfil_texto = perfil_texto  
+        st.text_area("🧾 Perfil para o prompt do chatbot:", perfil_texto, height=300)       
 
 
 elif modo == "Chatbot":
     
     st.header("Chatbot")
-
     # Inicializa o cliente OpenAI com a nova sintaxe
     # É uma boa prática inicializar o cliente uma vez e reutilizá-lo
-    if "client" not in st.session_state:
-        st.session_state.client = openai.OpenAI(api_key=st.secrets['OPENAI_API_KEY'])
+    #if "client" not in st.session_state:
+    #    st.session_state.client = openai.OpenAI(api_key=st.secrets['OPENAI_API_KEY'])
 
     if "openai_model" not in st.session_state:
         st.session_state['openai_model'] = "gpt-4o-mini"
@@ -225,6 +219,7 @@ elif modo == "Chatbot":
             if 'perfil_texto' in st.session_state and st.session_state.perfil_texto:
                 messages_for_api.append({"role": "system", "content": st.session_state.perfil_texto})
 
+
             # Adiciona as mensagens do histórico do chat
             for m in st.session_state.messages:
                 messages_for_api.append({'role': m['role'], 'content': m["content"]})
@@ -243,3 +238,4 @@ elif modo == "Chatbot":
             except Exception as e:
                 st.error(f"Ocorreu um erro ao chamar a API: {e}")
                 st.session_state.messages.append({'role': 'assistant', 'content': f"Desculpe, algo deu errado: {e}"})
+#st.sidebar.text_area(f"System prompt: {messages_for_api[0]['content']}")

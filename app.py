@@ -1,4 +1,3 @@
-# app.py
 import streamlit as st
 import openai
 import pandas as pd
@@ -13,18 +12,17 @@ if 'api_client_ready' not in st.session_state:
     st.session_state['api_client_ready'] = False
 if 'api_source' not in st.session_state:
     st.session_state['api_source'] = "None"
-# Não precisamos mais do estado 'logged_in' se a única forma é por API.
 
 st.sidebar.title("Configuração da API") # Mudança de "Acesso ao Aplicativo" para "Configuração da API"
 
-# MANTÉM APENAS A OPÇÃO DE INSERIR A PRÓPRIA API
+# INSERIR A PRÓPRIA API
 with st.sidebar.expander("Insira Sua Chave de API da OpenAI"): # Nome do expander ajustado
     user_api_key = st.text_input("Sua Chave de API:", type="password", key="user_api_key_input").strip()
     if st.button("Configurar API", key="configure_user_api"):
         if user_api_key:
             try:
                 st.session_state.client = openai.OpenAI(api_key=user_api_key)
-                # Opcional: Testar a chave com uma chamada simples para validar (descomente se quiser)
+                # Testar a chave com uma chamada simples 
                 st.session_state.client.models.list()
                 st.success("Chave de API configurada com sucesso!")
                 st.session_state['api_client_ready'] = True
@@ -38,12 +36,12 @@ with st.sidebar.expander("Insira Sua Chave de API da OpenAI"): # Nome do expande
 
 st.sidebar.markdown(f"Status da API: **{st.session_state.get('api_source', 'Não Configurada')}**") # Texto de status ajustado
 
-# Somente renderize o restante do aplicativo se a API estiver pronta
+# Somente carrega o restante do aplicativo se a API estiver pronta
 if not st.session_state['api_client_ready']:
     st.info("Por favor, configure sua chave de API da OpenAI na barra lateral para usar o aplicativo.")
     st.stop() # Impede a execução do restante do script
 
-# Menu lateral para escolher o modo
+# Menu lateral
 modo = st.sidebar.radio("Escolha o modo:", ["📝 Preencher BFI-44", "🎛️ Definir facetas manualmente", "🤖 Chatbot"])
 
 # ----------------------------------------
@@ -52,7 +50,7 @@ modo = st.sidebar.radio("Escolha o modo:", ["📝 Preencher BFI-44", "🎛️ De
 if modo == "📝 Preencher BFI-44" :
     st.header("📋 Questionário de Personalidade (BFI-44)")
     
-    # Lista simplificada de itens do BFI-44 (adicione os 44 reais)
+    # Lista simplificada de itens do BFI-44 - a ser revisada
     items_bfi = [
     {"id": 1, "text": "É extrovertido, sociável."},
     {"id": 2, "text": "Tende a encontrar falhas nos outros."},
@@ -125,7 +123,7 @@ if modo == "📝 Preencher BFI-44" :
         st.download_button("📥 Baixar CSV", data=df_responses.to_csv(index=False), file_name=filename, mime="text/csv")
 
 # ----------------------------------------
-# MODO 2: Definir manualmente as facetas
+# MODO 2: Definir manualmente as facetas - não estão todas!
 # ----------------------------------------
 elif modo == "🎛️ Definir facetas manualmente":
     st.header("🎛️ Definir níveis das facetas manualmente")
@@ -175,7 +173,7 @@ elif modo == "🎛️ Definir facetas manualmente":
         st.text_area("🧾 Perfil para o prompt do chatbot:", text_profile, height=300)       
 
 # ----------------------------------------
-# MODO 3: Chatbot com personalidade - ainda tem um pequeno bug presente
+# MODO 3: Chatbot com personalidade - só funciona se definir as facetas
 # ----------------------------------------
 
 elif modo == "🤖 Chatbot":
@@ -210,16 +208,9 @@ elif modo == "🤖 Chatbot":
         with st.chat_message(name="assistant", avatar="🤖"):
             message_placeholder = st.empty()
             full_response = ""
-
-            # Nova forma de chamar a API de Chat Completions
-            # Adiciona o system prompt com o perfil se ele estiver disponível
             messages_for_api = []
-            # Certifique-se de que 'text_profile' está definido e acessível aqui.
-            # Se 'text_profile' vem da seção de facetas, você precisará garantir que
-            # ele seja gerado antes ou armazenado em st.session_state.
             
-            # Exemplo de como você poderia integrar o text_profile como um system prompt
-            # Assumindo que text_profile está disponível (você pode passá-lo via session_state)
+
             if 'text_profile' in st.session_state and st.session_state.text_profile:
                 messages_for_api.append({"role": "system", "content": st.session_state.text_profile})
 
@@ -232,11 +223,11 @@ elif modo == "🤖 Chatbot":
             try:
                 for chunk in st.session_state.client.chat.completions.create(
                     model=st.session_state['openai_model'],
-                    messages=messages_for_api, # Usamos as mensagens com o system prompt
+                    messages=messages_for_api, # mensagens com o system prompt
                     stream=True,
                 ):
                     full_response += chunk.choices[0].delta.content or ""
-                    message_placeholder.markdown(full_response + "|") # Adiciona um cursor piscando
+                    message_placeholder.markdown(full_response + "|") 
                 message_placeholder.markdown(full_response)
                 st.session_state.messages.append({'role': 'assistant', 'content': full_response})
             except Exception as e:

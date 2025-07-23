@@ -96,24 +96,24 @@ else:
     st.header("🎛️ Definir níveis das facetas manualmente")
 
     facetas = [
-        "Sociabilidade",
-        "Assertividade",
-        "Nível de energia",
-        "Cortesia",
-        "Altruísmo",
-        "Organização",
-        "Disciplina",
-        "Ansiedade",
-        "Vulnerabilidade",
-        "Abertura à estética",
-        "Imaginação",
-        "Curiosidade intelectual"
-    ]
+    {"nome": "Sociabilidade", "descricao": "Tendência a ser sociável, falante e buscar interação social."},
+    {"nome": "Assertividade", "descricao": "Inclinação a tomar a liderança e expressar opiniões com confiança."},
+    {"nome": "Nível de energia", "descricao": "Grau de entusiasmo, dinamismo e vigor nas ações cotidianas."},
+    {"nome": "Cortesia", "descricao": "Tendência a ser educado, respeitoso e tratar os outros com consideração."},
+    {"nome": "Altruísmo", "descricao": "Disposição para ajudar, mostrar empatia e se preocupar com os outros."},
+    {"nome": "Organização", "descricao": "Capacidade de manter ordem, planejamento e estrutura nas atividades."},
+    {"nome": "Disciplina", "descricao": "Determinação para seguir metas, regras e concluir tarefas com foco."},
+    {"nome": "Ansiedade", "descricao": "Propensão a se preocupar, sentir tensão e reagir ao estresse."},
+    {"nome": "Vulnerabilidade", "descricao": "Tendência a se sentir emocionalmente instável ou facilmente sobrecarregado."},
+    {"nome": "Abertura à estética", "descricao": "Sensibilidade a arte, beleza e experiências sensoriais."},
+    {"nome": "Imaginação", "descricao": "Capacidade criativa, fantasiosa e voltada à invenção de ideias."},
+    {"nome": "Curiosidade intelectual", "descricao": "Desejo de aprender, explorar conceitos e buscar entendimento profundo."}
+]
 
     niveis = {}
     with st.form("facetas_form"):
         for faceta in facetas:
-            niveis[faceta] = st.selectbox(f"{faceta}:", ["Baixo", "Médio", "Alto"])
+            niveis[faceta] = st.selectbox(f"{faceta}:", ["Baixo", "Médio", "Alto"], help=faceta['descrição'])
         
         gerar_perfil = st.form_submit_button("Gerar perfil descritivo")
 

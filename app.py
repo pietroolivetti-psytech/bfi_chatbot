@@ -2,6 +2,7 @@
 import streamlit as st
 import pandas as pd
 from datetime import datetime
+#ch
 
 st.set_page_config(page_title="Chatbot com Personalidade", layout="wide")
 
@@ -13,7 +14,7 @@ modo = st.sidebar.radio("Escolha o modo:", ["📝 Preencher BFI-44", "🎛️ De
 # ----------------------------------------
 # MODO 1: Preencher BFI-44
 # ----------------------------------------
-if modo == "📝 Preencher BFI-44":
+if modo == "📝 Preencher BFI-44" :
     st.header("📋 Questionário de Personalidade (BFI-44)")
     
     # Lista simplificada de itens do BFI-44 (adicione os 44 reais)

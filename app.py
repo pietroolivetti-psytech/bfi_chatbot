@@ -1,12 +1,65 @@
 # app.py
 import streamlit as st
+import openai
 import pandas as pd
 from datetime import datetime
-#ch
 
 st.set_page_config(page_title="Chatbot com Personalidade", layout="wide")
 
 st.title("💬 Personalidade do Chatbot")
+
+# Defina sua senha (idealmente, também em secrets.toml)
+# Ex: APP_PASSWORD = "sua_senha_secreta_aqui" em .streamlit/secrets.toml
+SENHA_CORRETA = st.secrets.get("APP_PASSWORD", "minhasenhaforte") # Use uma senha forte de verdade!
+
+# Inicializa o estado da sessão para controle de acesso e API
+if 'api_client_ready' not in st.session_state:
+    st.session_state['api_client_ready'] = False
+if 'api_source' not in st.session_state:
+    st.session_state['api_source'] = "Nenhuma"
+
+st.sidebar.title("Acesso ao Aplicativo")
+
+# Opção 1: Usar a API secreta (com senha)
+with st.sidebar.expander("Usar Minha API (com senha)"):
+    password_input = st.text_input("Senha:", type="password", key="password_input")
+    if st.button("Acessar com Senha", key="access_with_password"):
+        if password_input == SENHA_CORRETA:
+            st.success("Login bem-sucedido! Usando sua API secreta.")
+            st.session_state.client = openai.OpenAI(api_key=st.secrets['OPENAI_API_KEY'])
+            st.session_state['api_client_ready'] = True
+            st.session_state['api_source'] = "Secreta"
+        else:
+            st.error("Senha incorreta.")
+            st.session_state['api_client_ready'] = False
+
+# Opção 2: Usuário insere a própria API
+with st.sidebar.expander("Usar Minha Própria API"):
+    user_api_key = st.text_input("Sua Chave de API da OpenAI:", type="password", key="user_api_key_input")
+    if st.button("Configurar API", key="configure_user_api"):
+        if user_api_key:
+            try:
+                st.session_state.client = openai.OpenAI(api_key=user_api_key)
+                # Opcional: Testar a chave com uma chamada simples para validar
+                # st.session_state.client.models.list()
+                st.success("Chave de API configurada com sucesso!")
+                st.session_state['api_client_ready'] = True
+                st.session_state['api_source'] = "Usuário"
+            except Exception as e:
+                st.error(f"Erro ao configurar a chave de API: {e}. Verifique se a chave é válida.")
+                st.session_state['api_client_ready'] = False
+        else:
+            st.warning("Por favor, insira sua chave de API.")
+            st.session_state['api_client_ready'] = False
+
+st.sidebar.markdown(f"Status da API: **{st.session_state.get('api_source', 'Nenhuma')}**")
+
+# Somente renderize o restante do aplicativo se a API estiver pronta
+if not st.session_state['api_client_ready']:
+    st.info("Por favor, acesse o aplicativo usando uma senha ou configurando sua chave de API na barra lateral.")
+    st.stop() # Impede a execução do restante do script
+
+# --- SEU CÓDIGO DO APLICATIVO PRINCIPAL COMEÇA AQUI ---
 
 # Menu lateral para escolher o modo
 modo = st.sidebar.radio("Escolha o modo:", ["📝 Preencher BFI-44", "🎛️ Definir facetas manualmente", "Chatbot"])
@@ -139,21 +192,67 @@ elif modo == "🎛️ Definir facetas manualmente":
 
         st.text_area("🧾 Perfil para o prompt do chatbot:", perfil_texto, height=300)
         
+
+
 elif modo == "Chatbot":
-    st.header("Chatbot")
     
+    st.header("Chatbot")
+
+    # Inicializa o cliente OpenAI com a nova sintaxe
+    # É uma boa prática inicializar o cliente uma vez e reutilizá-lo
+    if "client" not in st.session_state:
+        st.session_state.client = openai.OpenAI(api_key=st.secrets['OPENAI_API_KEY'])
+
+    if "openai_model" not in st.session_state:
+        st.session_state['openai_model'] = "gpt-4o-mini"
+
     if "messages" not in st.session_state:
         st.session_state.messages = []
+
+    # Exibe mensagens anteriores
     for message in st.session_state.messages:
         with st.chat_message(message['role']):
             st.markdown(message['content'])
-    
-    if prompt := st.chat_input("escreve aqui"):
+
+    # Captura a entrada do usuário
+    if prompt := st.chat_input("Escreva aqui"):
+        # Adiciona a mensagem do usuário ao histórico e exibe
+        st.session_state.messages.append({"role": "user", "content": prompt})
         with st.chat_message(name="user"):
             st.markdown(prompt)
-            
-    st.session_state.messages.append({"role": "user", "content": prompt})
         
-    
-    #with st.chat_message(name="assistant", avatar="🤖"):
-    #    st.write("Oi!")
+        # Prepara a mensagem para o assistente
+        with st.chat_message(name="assistant", avatar="🤖"):
+            message_placeholder = st.empty()
+            full_response = ""
+
+            # Nova forma de chamar a API de Chat Completions
+            # Adiciona o system prompt com o perfil se ele estiver disponível
+            messages_for_api = []
+            # Certifique-se de que 'perfil_texto' está definido e acessível aqui.
+            # Se 'perfil_texto' vem da seção de facetas, você precisará garantir que
+            # ele seja gerado antes ou armazenado em st.session_state.
+            
+            # Exemplo de como você poderia integrar o perfil_texto como um system prompt
+            # Assumindo que perfil_texto está disponível (você pode passá-lo via session_state)
+            if 'perfil_texto' in st.session_state and st.session_state.perfil_texto:
+                messages_for_api.append({"role": "system", "content": st.session_state.perfil_texto})
+
+            # Adiciona as mensagens do histórico do chat
+            for m in st.session_state.messages:
+                messages_for_api.append({'role': m['role'], 'content': m["content"]})
+            
+            # Faz a chamada à API
+            try:
+                for chunk in st.session_state.client.chat.completions.create(
+                    model=st.session_state['openai_model'],
+                    messages=messages_for_api, # Usamos as mensagens com o system prompt
+                    stream=True,
+                ):
+                    full_response += chunk.choices[0].delta.content or ""
+                    message_placeholder.markdown(full_response + "|") # Adiciona um cursor piscando
+                message_placeholder.markdown(full_response)
+                st.session_state.messages.append({'role': 'assistant', 'content': full_response})
+            except Exception as e:
+                st.error(f"Ocorreu um erro ao chamar a API: {e}")
+                st.session_state.messages.append({'role': 'assistant', 'content': f"Desculpe, algo deu errado: {e}"})

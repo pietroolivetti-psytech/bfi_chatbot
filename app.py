@@ -12,7 +12,7 @@ st.title("💬 Personalidade do Chatbot")
 if 'api_client_ready' not in st.session_state:
     st.session_state['api_client_ready'] = False
 if 'api_source' not in st.session_state:
-    st.session_state['api_source'] = "Nenhuma"
+    st.session_state['api_source'] = "None"
 # Não precisamos mais do estado 'logged_in' se a única forma é por API.
 
 st.sidebar.title("Configuração da API") # Mudança de "Acesso ao Aplicativo" para "Configuração da API"
@@ -44,69 +44,69 @@ if not st.session_state['api_client_ready']:
     st.stop() # Impede a execução do restante do script
 
 # Menu lateral para escolher o modo
-modo = st.sidebar.radio("Escolha o modo:", ["📝 Preencher BFI-44", "🎛️ Definir facetas manualmente", "Chatbot"])
+modo = st.sidebar.radio("Escolha o modo:", ["📝 Preencher BFI-44", "🎛️ Definir facetas manualmente", "🤖 Chatbot"])
 
 # ----------------------------------------
-# MODO 1: Preencher BFI-44
+# MODO 1: Preencher BFI-44 - ainda não está pronto. A ideia é gerar uma descrição verbal de facetas.
 # ----------------------------------------
 if modo == "📝 Preencher BFI-44" :
     st.header("📋 Questionário de Personalidade (BFI-44)")
     
     # Lista simplificada de itens do BFI-44 (adicione os 44 reais)
-    itens_bfi = [
-    {"id": 1, "texto": "É extrovertido, sociável."},
-    {"id": 2, "texto": "Tende a encontrar falhas nos outros."},
-    {"id": 3, "texto": "Faz as coisas com eficiência."},
-    {"id": 4, "texto": "É ansioso, facilmente perturbado."},
-    {"id": 5, "texto": "Tem uma imaginação ativa."},
-    {"id": 6, "texto": "É reservado."},
-    {"id": 7, "texto": "É prestativo e altruísta com os outros."},
-    {"id": 8, "texto": "É descuidado."},
-    {"id": 9, "texto": "Se sente relaxado, lida bem com o estresse."},
-    {"id": 10, "texto": "Tem poucos interesses artísticos."},
-    {"id": 11, "texto": "É falante."},
-    {"id": 12, "texto": "É simpático e caloroso."},
-    {"id": 13, "texto": "É confiável, faz o que promete."},
-    {"id": 14, "texto": "Se enerva facilmente."},
-    {"id": 15, "texto": "É original, tem ideias novas."},
-    {"id": 16, "texto": "É reservado com estranhos."},
-    {"id": 17, "texto": "É considerado com os sentimentos dos outros."},
-    {"id": 18, "texto": "Faz as coisas de maneira descuidada."},
-    {"id": 19, "texto": "É emocionalmente estável, não se perturba facilmente."},
-    {"id": 20, "texto": "É inventivo."},
-    {"id": 21, "texto": "Fala com entusiasmo."},
-    {"id": 22, "texto": "Tem uma natureza firme."},
-    {"id": 23, "texto": "Faz as coisas com eficiência."},
-    {"id": 24, "texto": "Se preocupa muito."},
-    {"id": 25, "texto": "Tem uma imaginação viva."},
-    {"id": 26, "texto": "Tende a ser quieto."},
-    {"id": 27, "texto": "É gentil e atencioso."},
-    {"id": 28, "texto": "Prefere trabalho desorganizado."},
-    {"id": 29, "texto": "Raramente se sente ansioso ou com medo."},
-    {"id": 30, "texto": "Tem poucos interesses criativos."},
-    {"id": 31, "texto": "É extrovertido, animado."},
-    {"id": 32, "texto": "Ajuda os outros espontaneamente."},
-    {"id": 33, "texto": "Tem senso de dever."},
-    {"id": 34, "texto": "Fica chateado facilmente."},
-    {"id": 35, "texto": "Valoriza experiências artísticas e estéticas."},
-    {"id": 36, "texto": "É tímido e silencioso."},
-    {"id": 37, "texto": "Sente compaixão com facilidade."},
-    {"id": 38, "texto": "É desorganizado."},
-    {"id": 39, "texto": "Raramente se sente deprimido ou triste."},
-    {"id": 40, "texto": "Tem imaginação ativa."},
-    {"id": 41, "texto": "É assertivo."},
-    {"id": 42, "texto": "Tende a ser cético quanto às intenções dos outros."},
-    {"id": 43, "texto": "Planeja com antecedência."},
-    {"id": 44, "texto": "É emocionalmente vulnerável."}
+    items_bfi = [
+    {"id": 1, "text": "É extrovertido, sociável."},
+    {"id": 2, "text": "Tende a encontrar falhas nos outros."},
+    {"id": 3, "text": "Faz as coisas com eficiência."},
+    {"id": 4, "text": "É ansioso, facilmente perturbado."},
+    {"id": 5, "text": "Tem uma imaginação ativa."},
+    {"id": 6, "text": "É reservado."},
+    {"id": 7, "text": "É prestativo e altruísta com os outros."},
+    {"id": 8, "text": "É descuidado."},
+    {"id": 9, "text": "Se sente relaxado, lida bem com o estresse."},
+    {"id": 10, "text": "Tem poucos interesses artísticos."},
+    {"id": 11, "text": "É falante."},
+    {"id": 12, "text": "É simpático e caloroso."},
+    {"id": 13, "text": "É confiável, faz o que promete."},
+    {"id": 14, "text": "Se enerva facilmente."},
+    {"id": 15, "text": "É original, tem ideias novas."},
+    {"id": 16, "text": "É reservado com estranhos."},
+    {"id": 17, "text": "É considerado com os sentimentos dos outros."},
+    {"id": 18, "text": "Faz as coisas de maneira descuidada."},
+    {"id": 19, "text": "É emocionalmente estável, não se perturba facilmente."},
+    {"id": 20, "text": "É inventivo."},
+    {"id": 21, "text": "Fala com entusiasmo."},
+    {"id": 22, "text": "Tem uma natureza firme."},
+    {"id": 23, "text": "Faz as coisas com eficiência."},
+    {"id": 24, "text": "Se preocupa muito."},
+    {"id": 25, "text": "Tem uma imaginação viva."},
+    {"id": 26, "text": "Tende a ser quieto."},
+    {"id": 27, "text": "É gentil e atencioso."},
+    {"id": 28, "text": "Prefere trabalho desorganizado."},
+    {"id": 29, "text": "Raramente se sente ansioso ou com medo."},
+    {"id": 30, "text": "Tem poucos interesses criativos."},
+    {"id": 31, "text": "É extrovertido, animado."},
+    {"id": 32, "text": "Ajuda os outros espontaneamente."},
+    {"id": 33, "text": "Tem senso de dever."},
+    {"id": 34, "text": "Fica chateado facilmente."},
+    {"id": 35, "text": "Valoriza experiências artísticas e estéticas."},
+    {"id": 36, "text": "É tímido e silencioso."},
+    {"id": 37, "text": "Sente compaixão com facilidade."},
+    {"id": 38, "text": "É desorganizado."},
+    {"id": 39, "text": "Raramente se sente deprimido ou triste."},
+    {"id": 40, "text": "Tem imaginação ativa."},
+    {"id": 41, "text": "É assertivo."},
+    {"id": 42, "text": "Tende a ser cético quanto às intenções dos outros."},
+    {"id": 43, "text": "Planeja com antecedência."},
+    {"id": 44, "text": "É emocionalmente vulnerável."}
 ]
 
     
-    respostas = {}
+    responses = {}
     
     with st.form("bfi_form"):
-        for item in itens_bfi:
-            respostas[item["id"]] = st.radio(
-                f"{item['id']}. {item['texto']}",
+        for item in items_bfi:
+            responses[item["id"]] = st.radio(
+                f"{item['id']}. {item['text']}",
                 [1, 2, 3, 4, 5],
                 horizontal=True
             )
@@ -114,15 +114,15 @@ if modo == "📝 Preencher BFI-44" :
         submit = st.form_submit_button("Enviar respostas e salvar CSV")
     
     if submit:
-        df_respostas = pd.DataFrame(list(respostas.items()), columns=["Item", "Resposta"])
+        df_responses = pd.DataFrame(list(responses.items()), columns=["Item", "Resposta"])
         
         # Nome do arquivo baseado no timestamp
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        nome_arquivo = f"respostas_bfi_{timestamp}.csv"
+        filename = f"responses_bfi_{timestamp}.csv"
         
-        df_respostas.to_csv(nome_arquivo, index=False)
+        df_responses.to_csv(filename, index=False)
         st.success("✅ Respostas salvas com sucesso!")
-        st.download_button("📥 Baixar CSV", data=df_respostas.to_csv(index=False), file_name=nome_arquivo, mime="text/csv")
+        st.download_button("📥 Baixar CSV", data=df_responses.to_csv(index=False), file_name=filename, mime="text/csv")
 
 # ----------------------------------------
 # MODO 2: Definir manualmente as facetas
@@ -131,59 +131,60 @@ elif modo == "🎛️ Definir facetas manualmente":
     st.header("🎛️ Definir níveis das facetas manualmente")
 
 
-    facetas = [
-        {"nome": "Sociabilidade", "descricao": "Tendência a ser sociável, falante e buscar interação social."},
-        {"nome": "Assertividade", "descricao": "Inclinação a tomar a liderança e expressar opiniões com confiança."},
-        {"nome": "Nível de energia", "descricao": "Grau de entusiasmo, dinamismo e vigor nas ações cotidianas."},
-        {"nome": "Cortesia", "descricao": "Tendência a ser educado, respeitoso e tratar os outros com consideração."},
-        {"nome": "Altruísmo", "descricao": "Disposição para ajudar, mostrar empatia e se preocupar com os outros."},
-        {"nome": "Organização", "descricao": "Capacidade de manter ordem, planejamento e estrutura nas atividades."},
-        {"nome": "Disciplina", "descricao": "Determinação para seguir metas, regras e concluir tarefas com foco."},
-        {"nome": "Ansiedade", "descricao": "Propensão a se preocupar, sentir tensão e reagir ao estresse."},
-        {"nome": "Vulnerabilidade", "descricao": "Tendência a se sentir emocionalmente instável ou facilmente sobrecarregado."},
-        {"nome": "Abertura à estética", "descricao": "Sensibilidade a arte, beleza e experiências sensoriais."},
-        {"nome": "Imaginação", "descricao": "Capacidade criativa, fantasiosa e voltada à invenção de ideias."},
-        {"nome": "Curiosidade intelectual", "descricao": "Desejo de aprender, explorar conceitos e buscar entendimento profundo."}
+    facets = [
+        {"name": "Sociabilidade", "description": "Tendência a ser sociável, falante e buscar interação social."},
+        {"name": "Assertividade", "description": "Inclinação a tomar a liderança e expressar opiniões com confiança."},
+        {"name": "Nível de energia", "description": "Grau de entusiasmo, dinamismo e vigor nas ações cotidianas."},
+        {"name": "Cortesia", "description": "Tendência a ser educado, respeitoso e tratar os outros com consideração."},
+        {"name": "Altruísmo", "description": "Disposição para ajudar, mostrar empatia e se preocupar com os outros."},
+        {"name": "Organização", "description": "Capacidade de manter ordem, planejamento e estrutura nas atividades."},
+        {"name": "Disciplina", "description": "Determinação para seguir metas, regras e concluir tarefas com foco."},
+        {"name": "Ansiedade", "description": "Propensão a se preocupar, sentir tensão e reagir ao estresse."},
+        {"name": "Vulnerabilidade", "description": "Tendência a se sentir emocionalmente instável ou facilmente sobrecarregado."},
+        {"name": "Abertura à estética", "description": "Sensibilidade a arte, beleza e experiências sensoriais."},
+        {"name": "Imaginação", "description": "Capacidade criativa, fantasiosa e voltada à invenção de ideias."},
+        {"name": "Curiosidade intelectual", "description": "Desejo de aprender, explorar conceitos e buscar entendimento profundo."}
     ]
 
-    niveis = {}
-    with st.form("facetas_form"):
-        for faceta_info in facetas:
-            nome_faceta = faceta_info["nome"]
-            descricao_faceta = faceta_info["descricao"]
+    levels = {}
+    with st.form("facets_form"):
+        for facets_info in facets:
+            facetname = facets_info["name"]
+            description_facets = facets_info["description"]
             
-            niveis[nome_faceta] = st.selectbox(f"{nome_faceta}:", ["Baixo", "Médio", "Alto"], help=descricao_faceta)
+            levels[facetname] = st.selectbox(f"{facetname}:", ["Baixo", "Médio", "Alto"], help=description_facets)
         
         gerar_perfil = st.form_submit_button("Gerar perfil descritivo")
 
     if gerar_perfil:
         st.subheader("🧠 Perfil gerado com base nas facetas:")
-        for faceta, nivel in niveis.items():
-            st.markdown(f"**{faceta}**: {nivel}")
+        for faceta, level in levels.items():
+            st.markdown(f"**{faceta}**: {level}")
 
-        # ---
         # Aqui é onde a mudança acontece para incluir as descrições
-        # ---
-        perfil_texto = "Você é um chatbot com a seguinte personalidade:\n"
-        for faceta_info in facetas:
-            nome_faceta = faceta_info["nome"]
-            descricao_faceta = faceta_info["descricao"]
-            nivel = niveis[nome_faceta] # Obtém o nível selecionado para esta faceta
+        #text_profile = "Você é um chatbot com a seguinte personalidade:\n"
+        text_profile = "Você simulará ser uma pessoa com a seguinte personalidade:\n"
+        for facets_info in facets:
+            facetname = facets_info["name"]
+            description_facets = facets_info["description"]
+            level = levels[facetname] 
             
-            perfil_texto += f"- **{nome_faceta}** ({descricao_faceta}): {nivel.lower()}.\n"
+            text_profile += f"- **{facetname}** ({description_facets}): {level.lower()}.\n"
             
-        st.session_state.perfil_texto = perfil_texto  
-        st.text_area("🧾 Perfil para o prompt do chatbot:", perfil_texto, height=300)       
+        st.session_state.text_profile = text_profile  
+        st.text_area("🧾 Perfil para o prompt do chatbot:", text_profile, height=300)       
 
+# ----------------------------------------
+# MODO 3: Chatbot com personalidade - ainda tem um pequeno bug presente
+# ----------------------------------------
 
-elif modo == "Chatbot":
+elif modo == "🤖 Chatbot":
     
-    st.header("Chatbot Personality", help=st.session_state.perfil_texto)
-    #st.button("Ver perfil do chatbot", help=st.session_state.perfil_texto)
+    st.header("Chatbot Personality", help=st.session_state.text_profile)
+    #st.button("Ver perfil do chatbot", help=st.session_state.text_profile)
 
         
-    # Inicializa o cliente OpenAI com a nova sintaxe
-    # É uma boa prática inicializar o cliente uma vez e reutilizá-lo
+    # Comentei por ter retirado o secrets.toml
     #if "client" not in st.session_state:
     #    st.session_state.client = openai.OpenAI(api_key=st.secrets['OPENAI_API_KEY'])
 
@@ -213,14 +214,14 @@ elif modo == "Chatbot":
             # Nova forma de chamar a API de Chat Completions
             # Adiciona o system prompt com o perfil se ele estiver disponível
             messages_for_api = []
-            # Certifique-se de que 'perfil_texto' está definido e acessível aqui.
-            # Se 'perfil_texto' vem da seção de facetas, você precisará garantir que
+            # Certifique-se de que 'text_profile' está definido e acessível aqui.
+            # Se 'text_profile' vem da seção de facetas, você precisará garantir que
             # ele seja gerado antes ou armazenado em st.session_state.
             
-            # Exemplo de como você poderia integrar o perfil_texto como um system prompt
-            # Assumindo que perfil_texto está disponível (você pode passá-lo via session_state)
-            if 'perfil_texto' in st.session_state and st.session_state.perfil_texto:
-                messages_for_api.append({"role": "system", "content": st.session_state.perfil_texto})
+            # Exemplo de como você poderia integrar o text_profile como um system prompt
+            # Assumindo que text_profile está disponível (você pode passá-lo via session_state)
+            if 'text_profile' in st.session_state and st.session_state.text_profile:
+                messages_for_api.append({"role": "system", "content": st.session_state.text_profile})
 
 
             # Adiciona as mensagens do histórico do chat

@@ -110,22 +110,47 @@ else:
     {"nome": "Curiosidade intelectual", "descricao": "Desejo de aprender, explorar conceitos e buscar entendimento profundo."}
 ]
 
-    niveis = {}
-    with st.form("facetas_form"):
-        for faceta in facetas:
-            niveis[faceta] = st.selectbox(f"{faceta}:", ["Baixo", "Médio", "Alto"], help=faceta['descrição'])
+import streamlit as st
+
+facetas = [
+    {"nome": "Sociabilidade", "descricao": "Tendência a ser sociável, falante e buscar interação social."},
+    {"nome": "Assertividade", "descricao": "Inclinação a tomar a liderança e expressar opiniões com confiança."},
+    {"nome": "Nível de energia", "descricao": "Grau de entusiasmo, dinamismo e vigor nas ações cotidianas."},
+    {"nome": "Cortesia", "descricao": "Tendência a ser educado, respeitoso e tratar os outros com consideração."},
+    {"nome": "Altruísmo", "descricao": "Disposição para ajudar, mostrar empatia e se preocupar com os outros."},
+    {"nome": "Organização", "descricao": "Capacidade de manter ordem, planejamento e estrutura nas atividades."},
+    {"nome": "Disciplina", "descricao": "Determinação para seguir metas, regras e concluir tarefas com foco."},
+    {"nome": "Ansiedade", "descricao": "Propensão a se preocupar, sentir tensão e reagir ao estresse."},
+    {"nome": "Vulnerabilidade", "descricao": "Tendência a se sentir emocionalmente instável ou facilmente sobrecarregado."},
+    {"nome": "Abertura à estética", "descricao": "Sensibilidade a arte, beleza e experiências sensoriais."},
+    {"nome": "Imaginação", "descricao": "Capacidade criativa, fantasiosa e voltada à invenção de ideias."},
+    {"nome": "Curiosidade intelectual", "descricao": "Desejo de aprender, explorar conceitos e buscar entendimento profundo."}
+]
+
+niveis = {}
+with st.form("facetas_form"):
+    for faceta_info in facetas:
+        nome_faceta = faceta_info["nome"]
+        descricao_faceta = faceta_info["descricao"]
         
-        gerar_perfil = st.form_submit_button("Gerar perfil descritivo")
+        niveis[nome_faceta] = st.selectbox(f"{nome_faceta}:", ["Baixo", "Médio", "Alto"], help=descricao_faceta)
+    
+    gerar_perfil = st.form_submit_button("Gerar perfil descritivo")
 
-    if gerar_perfil:
-        st.subheader("🧠 Perfil gerado com base nas facetas:")
-        for faceta, nivel in niveis.items():
-            st.markdown(f"**{faceta}**: {nivel}")
+if gerar_perfil:
+    st.subheader("🧠 Perfil gerado com base nas facetas:")
+    for faceta, nivel in niveis.items():
+        st.markdown(f"**{faceta}**: {nivel}")
 
-        # Aqui você pode gerar o texto que será usado como system prompt no chatbot
-        perfil_texto = "Você é um chatbot com a seguinte personalidade:\n"
-        for faceta, nivel in niveis.items():
-            perfil_texto += f"- {faceta}: {nivel.lower()}.\n"
+    # ---
+    # Aqui é onde a mudança acontece para incluir as descrições
+    # ---
+    perfil_texto = "Você é um chatbot com a seguinte personalidade:\n"
+    for faceta_info in facetas:
+        nome_faceta = faceta_info["nome"]
+        descricao_faceta = faceta_info["descricao"]
+        nivel = niveis[nome_faceta] # Obtém o nível selecionado para esta faceta
+        
+        perfil_texto += f"- **{nome_faceta}** ({descricao_faceta}): {nivel.lower()}.\n"
 
-        st.text_area("🧾 Perfil para o prompt do chatbot:", perfil_texto, height=200)
-
+    st.text_area("🧾 Perfil para o prompt do chatbot:", perfil_texto, height=300)

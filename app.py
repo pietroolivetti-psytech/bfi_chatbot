@@ -20,19 +20,6 @@ if 'api_source' not in st.session_state:
 
 st.sidebar.title("Acesso ao Aplicativo")
 
-# Opção 1: Usar a API secreta (com senha)
-with st.sidebar.expander("Usar Minha API (com senha)"):
-    password_input = st.text_input("Senha:", type="password", key="password_input")
-    if st.button("Acessar com Senha", key="access_with_password"):
-        if password_input == SENHA_CORRETA:
-            st.success("Login bem-sucedido! Usando sua API secreta.")
-            st.session_state.client = openai.OpenAI(api_key=st.secrets['OPENAI_API_KEY'])
-            st.session_state['api_client_ready'] = True
-            st.session_state['api_source'] = "Secreta"
-        else:
-            st.error("Senha incorreta.")
-            st.session_state['api_client_ready'] = False
-
 # Opção 2: Usuário insere a própria API
 with st.sidebar.expander("Usar Minha Própria API"):
     user_api_key = st.text_input("Sua Chave de API da OpenAI:", type="password", key="user_api_key_input")

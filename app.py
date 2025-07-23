@@ -178,7 +178,10 @@ elif modo == "🎛️ Definir facetas manualmente":
 
 elif modo == "Chatbot":
     
-    st.header("Chatbot")
+    st.header("Chatbot Personality", help=st.session_state.perfil_texto)
+    #st.button("Ver perfil do chatbot", help=st.session_state.perfil_texto)
+
+        
     # Inicializa o cliente OpenAI com a nova sintaxe
     # É uma boa prática inicializar o cliente uma vez e reutilizá-lo
     #if "client" not in st.session_state:
